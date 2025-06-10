@@ -1,0 +1,17 @@
+
+# Files
+tailwind*
+pywst_config*
+components/*.html
+components/r/*.html
+svg/*.html
+pages/*.html
+CSS/tin.css
+prueba_json.html
+
+# OS
+*.DS_Store
+
+# Directories
+.idea
+dummy_assets
