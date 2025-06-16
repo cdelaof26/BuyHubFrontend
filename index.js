@@ -25,7 +25,7 @@ function toggle_search_bar() {
     set_search_bar_state(document.getElementById("middle-component-bottom").classList.contains("invisible"));
 }
 
-function set_component_config({ show_search, middle_component_text, show_trash_can }) {
+function set_component_config({ show_search, middle_component_text, show_trash_can, middle_component_action }) {
     const middle = document.getElementById("middle-component-bottom");
 
     toggle_class(!show_search, "search-button", "invisible");
@@ -43,6 +43,7 @@ function set_component_config({ show_search, middle_component_text, show_trash_c
     if (middle_component_text !== null) {
         middle.children[0].type = "button";
         middle.children[0].value = middle_component_text;
+        middle.children[0].onclick = middle_component_action;
     }
 }
 
@@ -64,6 +65,17 @@ function show_menu() {
     toggle_class(false, element, "-translate-x-full");
 }
 
+function remove_screen(element_id) {
+    const element = document.getElementById(element_id);
+    if (element_id === "main-menu") {
+        toggle_class(true, element, "-translate-x-full");
+        return;
+    }
+
+    element.parentElement.removeChild(element);
+    set_component_config(saved_config);
+}
+
 function close_menu(evt) {
     let sender = null;
     let evt_parent = evt.target.parentElement;
@@ -72,14 +84,11 @@ function close_menu(evt) {
         evt_parent = evt_parent.parentElement;
     }
 
-    const element = document.getElementById(sender);
-    if (sender === "main-menu") {
-        toggle_class(true, element, "-translate-x-full");
-        return;
-    }
+    remove_screen(sender);
+}
 
-    element.parentElement.removeChild(element);
-    set_component_config(saved_config);
+function hide_login_button_page() {
+    toggle_class(true, "login-button-page", "hidden");
 }
 
 function show_page(component, component_id, bottom_component_options) {
@@ -97,7 +106,8 @@ function show_page(component, component_id, bottom_component_options) {
 
 function show_login() {
     show_page(login(), "login-form", {
-        show_search: false, middle_component_text: "Iniciar sesión", show_trash_can: false
+        show_search: false, middle_component_text: "Iniciar sesión", show_trash_can: false,
+        middle_component_action: signIn
     });
 }
 
@@ -126,3 +136,23 @@ document.addEventListener("DOMContentLoaded", () => {
     h.id = "app-body";
     document.getElementById("app-body").replaceWith(h);
 });
+
+let error_times = 1;
+
+function set_error_msg(msg) {
+    if (msg === undefined)
+        return;
+
+    const container = document.getElementById("error-msg");
+    if (msg.length === 0) {
+        error_times = 1;
+        toggle_class(true, container, "translate-y-full");
+        return;
+    }
+
+    toggle_class(false, container, "translate-y-full");
+    document.getElementById("error-count").textContent = `Error (${error_times})`;
+    error_times++;
+
+    document.getElementById("error-text").textContent = msg;
+}

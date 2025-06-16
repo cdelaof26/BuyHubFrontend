@@ -5,6 +5,7 @@
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 		<link rel="stylesheet" type="text/css" href="CSS/tout.css">
+		<script src="request.js"></script>
 		<script src="index.js"></script>
 
 		<script src="components/r/carrousel_element.js"></script>
@@ -56,6 +57,20 @@
 			</label>
 			<button id="trash-can" class="invisible self-center p-4 rounded-full backdrop-filter backdrop-blur-lg border border-dim-0/50 dark:border-dim-1/50">
 				<script src="svg/trash.js" classData="size-7"></script>
+			</button>
+		</div>
+
+		<div id="error-msg" class="translate-y-full transition-[translate] duration-250 flex justify-between p-4 z-[500] rounded-t-2xl fixed bottom-0 left-0 w-full h-30 z-[100] bg-violet-700 dark:bg-violet-800 text-white">
+			<div class="flex flex-col w-[90%] overflow-y-scroll">
+				<span id="error-count" class="text-xl">
+					Error (1)
+				</span>
+				<span id="error-text">
+					Ocurrió un error
+				</span>
+			</div>
+			<button onclick="set_error_msg('')" class="m-2">
+				<script src="svg/x_mark.js" classData="size-10"></script>
 			</button>
 		</div>
 	</body>
