@@ -27,14 +27,16 @@ function get_cookies() {
 }
 
 function request(url, head) {
-    return fetch("buyhub/rest/" + url, head).then(response => {
-        return response.json();
+    return fetch("buyhub/rest/" + url, head).then(async (response) => {
+        const text = await response.text();
+        // console.log(text);
+        return JSON.parse(text);
     }).catch(error => {
         console.error(error);
     });
 }
 
-function signIn() {
+function sign_in() {
     const mail = document.getElementById("mail").value;
     const pass = document.getElementById("pass").value;
     const request_data = structuredClone(REQUEST_BASE);
@@ -57,6 +59,84 @@ function signIn() {
 
         remove_screen("login-form");
         hide_login_button_page();
+    }).catch(error => {
+        console.error(error);
+        set_error_msg("Ocurrió un error inesperado, intenta de nuevo");
+    });
+}
+
+function load_img(evt) {
+    const file = evt.target.files[0];
+    if (!file)
+        return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        // reader.result contains at the beginning: "data:image/jpeg;base64,"
+        const data = e.target.result.split(',')[1];
+        // console.log(data);
+        document.getElementById("product-image-data").textContent = data;
+    };
+    reader.readAsDataURL(file);
+}
+
+function register_product() {
+    const name = document.getElementById("product-name").value;
+    const description = document.getElementById("product-desc").value;
+    const price = document.getElementById("product-price").value;
+    const stock = document.getElementById("product-stock").value;
+    const image = document.getElementById("product-image-data").textContent;
+
+    const request_data = structuredClone(REQUEST_BASE);
+
+    const cookies = get_cookies();
+    request_data.headers["User-Id"] = cookies.UserId;
+    request_data.headers["Session-Token"] = cookies.SessionToken;
+
+    request_data.body = JSON.stringify({
+        "name": name,
+        "description": description,
+        "price": price,
+        "availableStock": stock,
+        "photo": image,
+    });
+
+    request("products/create", request_data).then(data => {
+        if (data.error !== undefined) {
+            set_error_msg(data.error);
+            return;
+        }
+
+        remove_screen("create-article-screen");
+    }).catch(error => {
+        console.error(error);
+        set_error_msg("Ocurrió un error inesperado, intenta de nuevo");
+    });
+}
+
+function add_to_bag(evt) {
+    const article_id = evt.target.getAttribute("articleId");
+    const amount = document.getElementById("selected-amount").value;
+
+    const request_data = structuredClone(REQUEST_BASE);
+
+    const cookies = get_cookies();
+    request_data.headers["User-Id"] = cookies.UserId;
+    request_data.headers["Session-Token"] = cookies.SessionToken;
+
+    console.log(article_id);
+    request_data.body = JSON.stringify({
+        "id": article_id,
+        "amount": amount
+    });
+
+    request("products/addToBag", request_data).then(data => {
+        if (data.error !== undefined) {
+            set_error_msg(data.error);
+            return;
+        }
+
+        set_error_msg("Articulo(s) agregado", "Éxito");
     }).catch(error => {
         console.error(error);
         set_error_msg("Ocurrió un error inesperado, intenta de nuevo");
